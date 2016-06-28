@@ -1,0 +1,139 @@
+{
+  "env": {
+    "node": true,
+    "browser": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "plugins": [
+    "flow-vars"
+  ],
+  "rules": {
+    "flow-vars/define-flow-type": [
+      "error"
+    ],
+    "flow-vars/use-flow-type": [
+      "error"
+    ],
+    "indent": [
+      "error",
+      "tab"
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "no-console": [
+      "off"
+    ],
+    "block-scoped-var": [
+      "error"
+    ],
+    "curly": [
+      "error",
+      "multi-line"
+    ],
+    "no-eval": [
+      "error"
+    ],
+    "no-implied-eval": [
+      "error"
+    ],
+    "no-extend-native": [
+      "error"
+    ],
+    "no-native-reassign": [
+      "error"
+    ],
+    "no-new-wrappers": [
+      "error"
+    ],
+    "no-proto": [
+      "error"
+    ],
+    "no-return-assign": [
+      "error"
+    ],
+    "no-self-compare": [
+      "error"
+    ],
+    "no-sequences": [
+      "error"
+    ],
+    "no-useless-call": [
+      "error"
+    ],
+    "no-useless-concat": [
+      "error"
+    ],
+    "no-useless-escape": [
+      "error"
+    ],
+    "no-shadow": [
+      "error"
+    ],
+    "global-require": [
+      "error"
+    ],
+    "brace-style": [
+      "error",
+      "1tbs",
+      {
+        "allowSingleLine": true
+      }
+    ],
+    "camelcase": [
+      "error"
+    ],
+    "key-spacing": [
+      "error"
+    ],
+    "no-array-constructor": [
+      "error"
+    ],
+    "no-mixed-operators": [
+      "error"
+    ],
+    "no-new-object": [
+      "error"
+    ],
+    "no-spaced-func": [
+      "error"
+    ],
+    "no-unneeded-ternary": [
+      "error"
+    ],
+    "operator-linebreak": [
+      "error"
+    ],
+    "no-duplicate-imports": [
+      "error"
+    ],
+    "no-useless-computed-key": [
+      "error"
+    ],
+    "no-useless-constructor": [
+      "error"
+    ],
+    "no-useless-rename": [
+      "error"
+    ],
+    "no-var": [
+      "error"
+    ],
+    "prefer-const": [
+      "error"
+    ],
+    "prefer-template": [
+      "error"
+    ]
+  }
+}

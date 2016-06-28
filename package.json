@@ -1,0 +1,52 @@
+{
+  "name": "@lfdoherty/gl-rtt-double-buffered",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Liam Doherty",
+  "dependencies": {
+    "@lfdoherty/gl-fbo": "^2.0.0",
+    "@lfdoherty/gl-fbo-texture2d-copy": "^0.1.0",
+    "@lfdoherty/gl-texture2d": "^3.0.0",
+    "glslify": "^5.0.2",
+    "babel-plugin-transform-class-properties": "^6.9.1",
+    "babel-plugin-transform-flow-strip-types": "^6.8.0",
+    "babel-plugin-typecheck": "^3.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babelify": "^7.3.0"
+  },
+  "scripts": {
+    "start": "beefy demo.js --transform babelify --open"
+  },
+  "main": "rtt_double_buffered",
+  "procgen-editor": "demo",
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015"
+          ],
+          "plugins": [
+            "transform-flow-strip-types",
+            "transform-class-properties"
+          ],
+          "comments": false,
+          "sourceType": "module"
+        }
+      ],
+      "glslify"
+    ]
+  },
+  "devDependencies": {
+    "@lfdoherty/gl-rtt": "^0.1.0",
+    "@lfdoherty/gl-texture2d-display": "^1.0.0",
+    "babel-eslint": "^6.0.4",
+    "beefy": "^2.1.8",
+    "eslint": "^2.13.0",
+    "eslint-plugin-flow-vars": "^0.4.0",
+    "gl-now": "^1.4.0",
+    "glsl-noise": "0.0.0",
+    "glsl-random": "0.0.5"
+  }
+}
