@@ -1,8 +1,9 @@
 
 
-const createFBO = require("@lfdoherty/gl-fbo")
+const makeFBO = require("@lfdoherty/gl-fbo")
 const drawTriangle = require("@lfdoherty/fast-big-triangle")
-const createShader = require('@lfdoherty/gl-shader')
+const makeShader = require('@lfdoherty/gl-shader')
+const f2 = require('@lfdoherty/float2')
 
 const defaultVertexShader = `
 attribute vec2 position;
@@ -49,12 +50,25 @@ export class Handle extends BaseHandle {
 		this.readBuffer = this.writeBuffer;
 		this.writeBuffer = temp;
 	}
+	getFbo() {
+		return this.readBuffer;
+	}
+	clear() {
+		this.writeBuffer.bind();
+		const gl = this.gl;
+		const dim = this.readBuffer.shape
+		gl.viewport(0, 0, dim[0], dim[1])
+		gl.clearColor(0, 0, 0, 0)
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		this._swap();
+	}
 	run(cb/*?: (uniforms)=>void|'do-not-fill-screen'*/) {
 
 
 		this.writeBuffer.bind();
 		this.shader.bind();
 		const dim = this.readBuffer.shape
+		
 		this.shader.uniforms.backBufferTexture = this.readBuffer.color[0].bind(0);
 		this.shader.uniforms.pixelDim = [1 / dim[0], 1 / dim[1]];
 		this.shader.uniforms.resolution = dim;
@@ -74,7 +88,7 @@ export class Handle extends BaseHandle {
 		}
 
 		this._swap();
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null)//TODO find a way to safely skip expensive safeguards like this
 		gl.useProgram(null)
 	}
 }
@@ -82,69 +96,20 @@ export class Handle extends BaseHandle {
 //export interface Pass {
 //	(cb/*?: (uniforms) => void | 'do-not-fill-screen'*/);
 //}
-export class MultipassHandle extends BaseHandle {
-	_passes;//: { [passName: string]/*: Pass */};
-	get passes(): any/*{ [passName: string]: Pass }*/ {
-		return this._passes;
-	}
-	constructor(gl, readBuffer, writeBuffer, passes: PassesType) {
-		super(gl, readBuffer, writeBuffer);
 
-		this._passes = {};
-		Object.keys(passes).forEach(passName => {
-			const passDef = passes[passName];
-
-			const vertShader = passDef.vert || defaultVertexShader;
-			const fragShader = passDef.frag || passDef;
-
-			const shader = createShader(this.gl, vertShader, fragShader);
-			const local = this;
-			this._passes[passName] = function(cb) {
-				local.writeBuffer.bind();
-				shader.bind();
-				const dim = local.readBuffer.shape
-				shader.uniforms.backBufferTexture = local.readBuffer.color[0].bind(0);
-				shader.uniforms.pixelDim = [1 / dim[0], 1 / dim[1]];
-				shader.uniforms.resolution = dim;
-				shader.uniforms.frameId = Math.random();
-				
-				if (cb) {
-					const result = cb(shader.uniforms);
-					if(result !== 'do-not-fill-screen'){
-						//gl.disable(gl.DEPTH_TEST);
-						drawTriangle(gl);
-					}
-				}else{
-					//gl.disable(gl.DEPTH_TEST);
-					drawTriangle(gl);
-				}
-				local._swap();
-			}
-		})
-	}
-	_swap() {
-		const temp = this.readBuffer;
-		this.readBuffer = this.writeBuffer;
-		this.writeBuffer = temp;
-	}
-	run() {
-		throw new Error('cannot "run" a multipass handle, you must run each pass separately, via the "passes" property.');
-	}
-}
-
-export function create(
+export function make(
 	gl: WebGLRenderingContext, 
-	dim: number[], 
+	dim: f2.Duck, 
 	shaderStrings: string | { vert: string, frag: string },
 	options: FboOptions = {}): Handle {
 
 	const vertShader = shaderStrings.vert || defaultVertexShader;
 	const fragShader = shaderStrings.frag || shaderStrings;
 
-	const readBuffer = createFBO(gl, dim, options);
-	const writeBuffer = createFBO(gl, dim, options);
+	const readBuffer = makeFBO(gl, f2.as(dim).toArray(), options);
+	const writeBuffer = makeFBO(gl, f2.as(dim).toArray(), options);
 
-	const shader = createShader(gl, vertShader, fragShader);
+	const shader = makeShader(gl, vertShader, fragShader);
 	//TODO check that fragment shader defines the right input sampler2D
 
 	const handle = new Handle(gl, readBuffer, writeBuffer, shader);
@@ -152,17 +117,3 @@ export function create(
 }
 
 export type PassesType = any;//{ [passName: string]: string | { vert: string, frag: string } };
-
-export function createMultipass(
-	gl: WebGLRenderingContext,
-	dim: number[],
-	passes: PassesType,
-	options: FboOptions = {}): MultipassHandle {
-
-	const readBuffer = createFBO(gl, dim, options);
-	const writeBuffer = createFBO(gl, dim, options);
-
-	const handle = new MultipassHandle(gl, readBuffer, writeBuffer, passes);
-	return handle;
-
-}
